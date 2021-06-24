@@ -1,0 +1,44 @@
+{
+    "RecommendEngine" : {
+        "n_users_first_stage" : 100,
+        "n_users_second_stage" : 3,
+        "n_memes_from_users_to_compare" : 1000,
+	"min_recall_threshold": 0.05,
+        "n_memes_from_nearest_users" : 10,
+        "n_memes_to_get_user_based" : 5,
+        "n_random_users_to_try_user_based" : 1000,
+        "n_last_liked_memes_from_user" : 5,
+        "n_memes_from_our_meme" : 3,
+        "n_memes_to_get_item_based" : 5,
+        "n_random_memes_to_try_item_based" : 3000,
+	"n_last_memes_to_choose_origin": 1000,
+        "n_memes_from_origin_to_choose": 1000,
+        "n_memes_to_get_origin_based": 5,
+    "n_memes_to_try_random_based" : 5000,
+        "n_memes_to_get_random_based" : 1,
+	"n_memes_pool_top_day": 2000,
+        "n_memes_for_binom_top_day": 100,
+        "n_memes_to_get_top_day_based": 5,
+    "n_memes_to_try_n_last_days_random_based" : 1000,
+        "n_memes_to_get_n_last_days_random_based" : 1,
+        "n_last_days_random" : 5,
+        "random_priority_power" : 3,
+        "methods_probs" : {"user_based" : 0.25, "origin_based": 0.2, "item_based" : 0.25, "random" : 0.0, "top_day_based": 0.05, "n_last_random" : 0.05, "top_based": 0.2}
+
+    },
+    "N_START_MEMES": 18,
+    "MAX_REJECTED": 10,
+    "MAX_ONREVIEW": 41,
+    "MAX_UPLOADS_A_DAY" : 20,
+    "N_MEMES_ON_LIST_PAGE" : 20,
+    "MemeOfTheDay": {
+        "send": "yes",
+        "at": "10:58"
+    },
+    "DailyRecalculation": {
+	"do": "yes",
+	"at": "01:00",
+	"regularization": 600,
+	"dislike_weight": -0.5
+    }
+}
