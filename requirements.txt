@@ -7,3 +7,4 @@ psycopg2-binary
 ImageHash
 schedule
 requests
+django-import-export
