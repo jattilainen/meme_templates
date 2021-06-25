@@ -6,17 +6,4 @@ python-telegram-bot
 psycopg2-binary
 ImageHash
 schedule
-navec
-pytesseract
-nltk
-symspellpy
-spacy==3.0.0
-easyocr
-scikit-image
-torch==1.8.1+cpu
-torchvision==0.9.1+cpu
-python-Levenshtein
-implicit
 requests
-cloudinary
-nudenet
