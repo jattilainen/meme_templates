@@ -33,7 +33,7 @@ import numpy as np
 
 
 class Command(BaseCommand):
-
+    help_message = "С помощью этого бота можно легко использовать популярные шаблоны из мемов в любых чатах. Достаточно в чате набрать @memebrandt_bot и дальше он подскажет, что делать"
     def start(self, update, context):
         context.bot.send_message(
             chat_id=update.message.chat_id,
@@ -65,6 +65,7 @@ class Command(BaseCommand):
         dispatcher = updater.dispatcher
         dispatcher.add_handler(InlineQueryHandler(self.inline_query, run_async=True))
         dispatcher.add_handler(CommandHandler('start', self.start, run_async=True, filters=Filters.chat_type.private))
+        dispatcher.add_handler(MessageHandler(Filters.photo & Filters.caption & Filters.chat_type.private, self.photo_with_caption_handler))
         dispatcher.add_handler(CommandHandler('help', self.help, run_async=True, filters=Filters.chat_type.private))
 
         dispatcher.add_error_handler(self.error_handler)
@@ -73,7 +74,6 @@ class Command(BaseCommand):
         if mode == "debug":
             updater.start_polling()
         elif mode == "prod":
-            print("WEBHOOK")
             PORT = int(os.environ.get("PORT", "8443"))
             HOSTNAME = os.environ.get("CURRENT_HOST")
             updater.start_webhook(listen="0.0.0.0",
@@ -134,13 +134,27 @@ class Command(BaseCommand):
                                switch_pm_parameter='inline-help', cache_time=0)
         end = time.time()
         response_time = int(1000 * (end - start))
-        if len(query) >= 3:
-            user_id = update.inline_query.from_user.id
-            template_id = sorted_templates[0].pk
-            LogInline.objects.create(
-                user_id=user_id,
-                template_id=template_id,
-                response_time=response_time,
+
+    def photo_with_caption_handler(self, update, context):
+        chat_id = update.message.chat.id
+        logger.info("photo_with_caption_handler {}".format(chat_id))
+        user = update.message.from_user
+        if (user['username'] in settings.BOT_ADMINS):
+            # here we choose the largest image to show to users
+            photo_id = update.message.photo[0].file_id
+            caption = update.message.caption
+            template = Template.objects.create(
+                telegram_id=photo_id,
+                text=caption,
             )
 
+            # here we choose the smallest image to reduce memory cost
+            file_id = update.message.photo[-1].file_id
+            newFile = context.bot.get_file(file_id)
+            # we have to use TEMP directory, instead of saving directly to TEMPLATE folder, because template.save creates copy
+            temp_meme_filename = os.path.join(settings.TEMP_PATH, uuid.uuid4().hex + ".jpg")
+            newFile.download(temp_meme_filename)
+            template.image.save(temp_meme_filename, File(open(temp_meme_filename, "rb")))
+            template.save()
+            self.send_message(context, chat_id, "Шаблон {} загружен".format(template.pk))
 
