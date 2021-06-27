@@ -8,3 +8,4 @@ ImageHash
 schedule
 requests
 django-import-export
+python-Levenshtein

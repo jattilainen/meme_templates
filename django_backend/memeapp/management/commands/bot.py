@@ -35,51 +35,10 @@ import numpy as np
 class Command(BaseCommand):
 
     def start(self, update, context):
-        chat_id = update.message.chat.id
-        invite_info = update.message.text.split(' ')
-
-        logger.info("start {}".format(chat_id))
-
-        profile, new_created = Profile.objects.get_or_create(
-            telegram_id=chat_id,
-        )
-
-        # cant add it to creation, because duplicate created with the same telegram_id
-        if new_created:
-            profile.start = 0
-            profile.save()
-
-        if new_created:
-            if len(invite_info) > 1:
-                invite_link = invite_info[1]
-                if len(invite_link) <= 10 and invite_link.isalnum():
-                    invite = Invite.objects.create(
-                        link=invite_info[1],
-                        user_id = profile.pk,
-                    )
-                else:
-                    logger.warning("hack_attempt {} {}".format(profile.pk, chat_id))
-            else:
-                invite = Invite.objects.create(
-                    link="no_link",
-                    user_id = profile.pk,
-                )
-
-
-        button_list = [[
-            InlineKeyboardButton(self.start_text, callback_data="reaction 0 -1 -1"),
-        ]]
-        reply_markup = InlineKeyboardMarkup(button_list)
-        if not new_created:
-            message = self.intro_message
-        else:
-            message = self.first_time_message
         context.bot.send_message(
             chat_id=update.message.chat_id,
-            text=message,
-            reply_markup=reply_markup,
+            text="Дарова",
         )
-        logger.info("intro_sent {} {} {}".format(profile.pk, chat_id, new_created))
 
     def help(self, update, context):
         context.bot.send_message(
@@ -110,12 +69,11 @@ class Command(BaseCommand):
 
         dispatcher.add_error_handler(self.error_handler)
 
-        Thread(target=self.schedule_checker).start()
-
         mode = settings.BOT_MODE
         if mode == "debug":
             updater.start_polling()
         elif mode == "prod":
+            print("WEBHOOK")
             PORT = int(os.environ.get("PORT", "8443"))
             HOSTNAME = os.environ.get("CURRENT_HOST")
             updater.start_webhook(listen="0.0.0.0",
@@ -126,7 +84,6 @@ class Command(BaseCommand):
                                   webhook_url="https://{}:{}/{}".format(HOSTNAME, PORT, settings.TG_TOKEN)
                                   )
         else:
-            logger.error("No MODE specified!")
             sys.exit(1)
 
 
@@ -173,7 +130,6 @@ class Command(BaseCommand):
         result = []
         for i in range(min(50, len(sorted_templates))):
             result.append(InlineQueryResultCachedPhoto(id=uuid.uuid4(), photo_file_id=sorted_templates[i].telegram_id))
-        logger.info("inline_query_result")
         update.inline_query.answer(results=result, switch_pm_text='More memes for you',
                                switch_pm_parameter='inline-help', cache_time=0)
         end = time.time()
