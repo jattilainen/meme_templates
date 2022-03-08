@@ -34,6 +34,23 @@ import numpy as np
 
 class Command(BaseCommand):
     help_message = "С помощью этого бота можно легко использовать популярные шаблоны из мемов в любых чатах. Достаточно в чате набрать @memebrandt_bot и дальше он подскажет, что делать"
+
+    @staticmethod
+    def send_message(context, chat_id, message, reply_markup=None, parse_mode=None):
+        if reply_markup:
+            context.bot.send_message(
+                chat_id=chat_id,
+                text=message,
+                reply_markup=reply_markup,
+                parse_mode=parse_mode,
+            )
+            return
+        context.bot.send_message(
+            chat_id=chat_id,
+            text=message,
+            parse_mode=parse_mode,
+        )
+
     def start(self, update, context):
         context.bot.send_message(
             chat_id=update.message.chat_id,
@@ -137,7 +154,6 @@ class Command(BaseCommand):
 
     def photo_with_caption_handler(self, update, context):
         chat_id = update.message.chat.id
-        logger.info("photo_with_caption_handler {}".format(chat_id))
         user = update.message.from_user
         if (user['username'] in settings.BOT_ADMINS):
             # here we choose the largest image to show to users
