@@ -19,7 +19,7 @@ import sys
 import os
 import json
 import datetime
-import Levenshtein
+import nltk
 import traceback
 import time
 import html
@@ -133,11 +133,11 @@ class Command(BaseCommand):
             str1 = str1.lower()
             str2 = str2.lower()
             if len(str1) >= len(str2):
-                return Levenshtein.distance(str1, str2)
+                return nltk.edit_distance(str1, str2)
             else:
                 best_match = len(str1)
                 for i in range(0, len(str2) - len(str1) + 1):
-                    best_match = min(best_match, Levenshtein.distance(str1, str2[i:i+len(str1)]))
+                    best_match = min(best_match, nltk.edit_distance(str1, str2[i:i+len(str1)]))
                 return best_match
         templates = np.array(Template.objects.all())
         text_matches = []
